@@ -1,3 +1,6 @@
+"use strict";
+/*jshint esversion: 6*/
+
 const express = require("express");
 const app = express();
 
@@ -5,6 +8,9 @@ app.use(express.static(__dirname + "/public"));
 
 const expressHbs = require("express-handlebars");
 const hbs = expressHbs.create({
+  runtimeOptions: {
+    allowProtoPropertiesByDefault: true,
+  },
   extname: "hbs",
   defaultLayout: "layout",
   layoutsDir: __dirname + "/views/layouts/",
@@ -13,8 +19,12 @@ const hbs = expressHbs.create({
 app.engine("hbs", hbs.engine);
 app.set("view engine", "hbs");
 
-app.get("/", (req, res) => {
-  res.render("index");
+app.use("/", require("./routes/indexRouter"));
+app.use("/products", require("./routes/productRouter"));
+
+app.get("/sync", (req, res) => {
+  let models = require("./models");
+  models.sequelize.sync().then(() => res.send("Database sync completed!"));
 });
 
 app.get("/:page", (req, res) => {
@@ -32,7 +42,9 @@ app.get("/:page", (req, res) => {
     "tracking-order": "Order Tracking",
   };
   let page = req.params.page;
-  res.render(page, { banner: banner[page] });
+  res.render(page, {
+    banner: banner[page],
+  });
 });
 
 app.set("port", process.env.PORT || 5000);
