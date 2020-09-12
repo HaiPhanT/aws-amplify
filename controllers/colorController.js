@@ -1,14 +1,14 @@
 const controller = {};
 const models = require("../models");
-const Category = models.Category;
+const Color = models.Color;
 
 controller.getAll = () => {
     return new Promise((resolve, reject) => {
-        Category
+        Color
             .findAll({
-                attributes: ['id', 'name', 'imagePath', 'summary'],
+                attributes: ['id', 'name', 'imagePath', 'code'],
                 include: [{
-                    model: models.Product
+                    model: models.ProductColor
                 }]
             })
             .then(data => resolve(data))
