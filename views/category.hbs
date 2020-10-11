@@ -69,56 +69,47 @@
         <!-- Start Filter Bar -->
         <div class="filter-bar d-flex flex-wrap align-items-center">
           <div class="sorting">
-            <select>
-              <option value="1">Default sorting</option>
-              <option value="1">Default sorting</option>
-              <option value="1">Default sorting</option>
+            <select id="sort" onchange="selectParams('sort', this.value)">
+              <option value="name">Default sorting</option>
+              <option value="price">Sorting by price</option>
+              <option value="overallReview">Sorting by review</option>
             </select>
           </div>
           <div class="sorting mr-auto">
-            <select>
-              <option value="1">Show 12</option>
-              <option value="1">Show 12</option>
-              <option value="1">Show 12</option>
+            <select id="limit" onchange="selectParams('limit', this.value)">
+              <option value="9">Show 9</option>
+              <option value="18">Show 18</option>
+              <option value="36">Show 36</option>
             </select>
           </div>
           <div>
-            <div class="input-group filter-bar-search">
-              <input type="text" placeholder="Search">
-              <div class="input-group-append">
-                <button type="button"><i class="ti-search"></i></button>
-              </div>
-            </div>
+            <form action="/products" method="GET">
+              <div class="input-group filter-bar-search">
+                <input type="text" name="search" placeholder="Search">
+                <div class="input-group-append">
+                  <button type="submit"><i class="ti-search"></i></button>
+                </div>
+            </form>
           </div>
         </div>
-        <!-- End Filter Bar -->
-        <!-- Start Best Seller -->
-        <section class="lattest-product-area pb-40 category-list">
-          <div class="row">
-            {{#each products}}
-            <div class="col-md-6 col-lg-4">
-              <div class="card text-center card-product">
-                <div class="card-product__img">
-                  <img class="card-img" src="{{imagePath}}" alt="">
-                  <ul class="card-product__imgOverlay">
-                    <li><button><i class="ti-search"></i></button></li>
-                    <li><button><i class="ti-shopping-cart"></i></button></li>
-                    <li><button><i class="ti-heart"></i></button></li>
-                  </ul>
-                </div>
-                <div class="card-body">
-                  <p>{{Category.name}}</p>
-                  <h4 class="card-product__title"><a href="/products/{{id}}">{{name}}</a></h4>
-                  <p class="card-product__price">${{price}}</p>
-                </div>
-              </div>
-            </div>
-            {{/each}}
-          </div>
-        </section>
-        <!-- End Best Seller -->
       </div>
+      <!-- End Filter Bar -->
+      <!-- Start Best Seller -->
+      <section class="lattest-product-area pb-40 category-list">
+        <div class="row">
+          {{#each products}}
+          {{> product}}
+          {{/each}}
+        </div>
+        <div class="row justify-content-center">
+          <nav id="pagination" aria-label="Page navigation example">
+            {{{createPagination pagination paginationClass="pagination"}}}
+          </nav>
+        </div>
+      </section>
+      <!-- End Best Seller -->
     </div>
+  </div>
   </div>
 </section>
 <!-- ================ category section end ================= -->
@@ -274,7 +265,11 @@
     brand: 0,
     color: 0,
     min: 0,
-    max: 100
+    max: 100,
+    limit: 9,
+    page: 1,
+    sort: "name",
+    search: ""
   }
 
   for (let key in defaultParams) {
@@ -283,12 +278,30 @@
     }
   }
 
-  for (let key in defaultParams) {
-    const control = $(`#${key}${urlParams.get(key)}`);
-    if (control) {
-      control.prop("checked", true);
+  $(document).ready(() => {
+    const checkboxes = ["category", "brand", "color"];
+    for (let key of checkboxes) {
+      const control = $(`#${key}${urlParams.get(key)}`);
+      if (control) {
+        control.prop("checked", true);
+      }
     }
-  }
+
+    $("#sort").val(urlParams.get("sort"));
+    $("#limit").val(urlParams.get("limit"));
+
+    $("#pagination li").addClass("page-item");
+    $("#pagination li a").addClass("page-link");
+
+    const currentPage = urlParams.get("page");
+    $("#pagination li a").each((index, item) => {
+      const page = $(item).attr("href").split("=")[1];
+      urlParams.set("page", page);
+      const href = `/products?${urlParams.toString()}`;
+      $(item).attr("href", href);
+    })
+
+  });
 
   function selectParams(key, value, reset = false) {
     if (reset) {
