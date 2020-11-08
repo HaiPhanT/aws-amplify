@@ -107,7 +107,7 @@
 									<div class="media-body">
 										<h4>{{User.fullname}}</h4>
 										<h5>{{createdAt}}</h5>
-										<a class="reply_btn" href="#">Reply</a>
+										<a class="reply_btn" onclick="showReply({{id}}, '{{User.fullname}}')">Reply</a>
 									</div>
 								</div>
 								<p>{{message}}</p>
@@ -121,7 +121,8 @@
 									<div class="media-body">
 										<h4>{{User.fullname}}</h4>
 										<h5>{{createdAt}}</h5>
-										<a class="reply_btn" href="#">Reply</a>
+										<a class="reply_btn"
+											onclick="showReply({{../id}}, '{{User.fullname}}')">Reply</a>
 									</div>
 								</div>
 								<p>{{message}}</p>
@@ -133,30 +134,25 @@
 					<div class="col-lg-6">
 						<div class="review_box">
 							<h4>Post a comment</h4>
-							<form class="row contact_form" action="contact_process.php" method="post" id="contactForm"
-								novalidate="novalidate">
+							<form class="row form-contact form-review mt-3" action="/comments" method="post"
+								id="contactForm" novalidate="novalidate">
 								<div class="col-md-12">
-									<div class="form-group">
-										<input type="text" class="form-control" id="name" name="name"
-											placeholder="Your Full name">
+									<div class="form-group form-inline">
+										<button type="button" class="close" id="closeButton" aria-label="Close"
+											onclick="removeReply()">
+											<span aria-hidden="true">&times; &nbsp;</span>
+										</button>
+										<label for="" id="reply"></label>
+										<input type="hidden" class="form-control" name="productId" id="productId"
+											value="{{id}}"></input>
+										<input type="hidden" class="form-control" name="parentCommentId"
+											id="parentCommentId" value=""></input>
 									</div>
 								</div>
 								<div class="col-md-12">
 									<div class="form-group">
-										<input type="email" class="form-control" id="email" name="email"
-											placeholder="Email Address">
-									</div>
-								</div>
-								<div class="col-md-12">
-									<div class="form-group">
-										<input type="text" class="form-control" id="number" name="number"
-											placeholder="Phone Number">
-									</div>
-								</div>
-								<div class="col-md-12">
-									<div class="form-group">
-										<textarea class="form-control" name="message" id="message" rows="1"
-											placeholder="Message"></textarea>
+										<textarea class="form-control different-control w-100" name="message" cols="30"
+											rows="5" placeholder="Enter Message"></textarea>
 									</div>
 								</div>
 								<div class="col-md-12 text-right">
@@ -364,3 +360,21 @@
 	</div>
 </section>
 <!--================ end related Product area =================-->
+
+<script>
+	function showReply(parentCommentId, fullname) {
+		$("#closeButton").show();
+		$("#reply").html("Reply " + fullname);
+		$("#parentCommentId").val(parentCommentId);
+	}
+
+	function removeReply() {
+		$("#closeButton").hide();
+		$("#reply").html("");
+		$("#parentCommentId").val("");
+	}
+
+	$(document).ready(() => {
+		$("#closeButton").hide();
+	})
+</script>
