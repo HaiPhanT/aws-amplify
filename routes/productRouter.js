@@ -77,6 +77,11 @@ router.get("/:id", (req, res, next) => {
     .getById(req.params.id)
     .then((product) => {
       res.locals.product = product;
+      let reviewController = require("../controllers/reviewController");
+      return reviewController.getUserReviewProduct(req.session.user ? req.session.user.id : 0, req.params.id);
+    })
+    .then(review => {
+      res.locals.userReview = review;
       res.render("single-product");
     })
     .catch((err) => next(err));

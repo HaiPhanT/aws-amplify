@@ -7,21 +7,18 @@ const userController = require("../controllers/userController");
 
 router.post("/", userController.isLoggedIn, (req, res, next) => {
 
-  const controller = require("../controllers/commentController");
-  const comment = {
-    userId: 1,
+  const controller = require("../controllers/reviewController");
+  const review = {
+    userId: req.session.user.id,
     productId: req.body.productId,
+    rating: req.body.rating,
     message: req.body.message,
   };
 
-  if (!isNaN(req.body.parentCommentId) && (req.body.parentCommentId != "")){
-    comment.parentCommentId = req.body.parentCommentId;
-  }
-
   controller
-    .add(comment)
-    .then(data => {
-      res.redirect("/products/" + data.productId);
+    .add(review)
+    .then(() => {
+      res.redirect("/products/" + review.productId);
     })
     .catch(error => next(error));
 
